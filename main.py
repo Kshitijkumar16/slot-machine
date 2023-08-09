@@ -1,3 +1,5 @@
+import random
+
 MAX_LINES = 3
 MAX_BET = 1000
 MIN_BET = 1
@@ -6,16 +8,19 @@ MIN_BET = 1
 def instructions():
      print("\n\n**********************************************************************************************************\n")
      print("\t\t\t\t!!  GRAND CASINO SLOT MACHINE  !!\n")
-     print("Rules - \n\t1. You first have to deposite an amount of chips, as per your liking.\n\t2. You can bet on 1 - 3 lines at a time.")
+     print("Rules - \n\t1. You first have to deposite an amount of chips upto 3000 max.\n\t2. You can bet on 1 - 3 lines at a time.")
      print(f"\t3. You cannot bet more than {MAX_BET} chips and less than {MIN_BET} chip per line.")
-     print("Good luck!\n")
+     print("\t4. The slot machine looks like this -\n\t\t A | D | B \t<-- line 1\n\t\t C | C | C \t<-- line 2  (a WIN on a line looks like this)\n\t\t D | A | C \t<-- line 3")
+     print("\t5. Betting on 1 line means TOP line, betting on two lines means TOP TWO lines.")
+     print("\nGood luck!\n")
      print("**********************************************************************************************************\n")
+     print("\nHi! This is Venessa!")
 
 
 # Function to take deposit from user
 def deposit():
      while True:
-          amount = input("\nHi! This is Venessa!\nHow many chips would you like to deposit?\n\t")
+          amount = input("\nHow many chips would you like to deposit?\n\t")
           if amount.isdigit():
                amount = int(amount)
                if amount > 0:
@@ -28,7 +33,7 @@ def deposit():
 
 def ask_nof_lines():
      while True:
-          lines = input("\nHow many lines you want to bet on? (1 - " + str(MAX_LINES) + ") \n\t")
+          lines = input("How many lines you want to bet on? (1 - " + str(MAX_LINES) + ") \n\t")
           if lines.isdigit():
                lines = int(lines)
                if 0 < lines <= MAX_LINES:
@@ -41,7 +46,7 @@ def ask_nof_lines():
 
 def ask_bet():
      while True:
-          bet = input("\nHow much would you like to bet per line? \n\t")
+          bet = input("How much would you like to bet per line? \n\t")
           if bet.isdigit():
                bet = int(bet)
                if bet > MAX_BET:
@@ -54,6 +59,9 @@ def ask_bet():
                print("\nPlease enter a number!!")
      return bet
 
+
+
+# Main body of the program 
 def main():
      instruct = instructions()
      balance = deposit()
