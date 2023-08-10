@@ -11,10 +11,24 @@ COLS = 3                  # Columns in the display
 
 # Dictionary containing all symbols in a single column/reel
 symbol_count_perCol = {
-     "A" : 1,             # 1 A on a column reel
-     "B" : 2,               
+     # "A" : 1,             # 1 A on a column reel
+     # "B" : 2,               
+     # "C" : 3,
+     # "D" : 4,             # 4 D's on the column reel
+     "E" : 6,
+     "F" : 2,
+     "G" : 2,
+}
+
+# Dictionary containing the winning multiplier for each symbol
+winning_multiplier = {
+     "A" : 5,
+     "B" : 4,
      "C" : 3,
-     "D" : 4,             # 4 D's on the column reel
+     "D" : 2,
+     "E" : 2,
+     "F" : 2,
+     "G":  2,
 }
 
 # Function to display all the instructions to the user
@@ -32,7 +46,7 @@ def instructions():
 # Function to take deposit from user
 def deposit():
      while True:                                 # To continuously ask user for input until its correct
-          amount = input("\nHow many chips would you like to deposit?\n\t")
+          amount = input("\nHow many chips would you like to deposit?\n")
           if amount.isdigit():                   # To make sure its a positive integer 
                amount = int(amount)
                if amount > 0:                    # Doing zero check
@@ -46,7 +60,7 @@ def deposit():
 # Function to ask user how many lines they want to bet on
 def ask_nof_lines():
      while True:
-          lines = input("How many lines you want to bet on? (1 - " + str(MAX_LINES) + ") \n\t")
+          lines = input("\nHow many lines you want to bet on? (1 - " + str(MAX_LINES) + ") \n")
           if lines.isdigit():
                lines = int(lines)
                if 0 < lines <= MAX_LINES:        # Validating users chosen number of lines
@@ -60,7 +74,7 @@ def ask_nof_lines():
 # Function to ask for the bet price 
 def ask_bet():
      while True:
-          bet = input("How much would you like to bet per line? \n\t")
+          bet = input("How much would you like to bet per line? \n")
           if bet.isdigit():
                bet = int(bet)
                if bet > MAX_BET:                 # Validating the bet price
@@ -104,35 +118,87 @@ def display_slots(columns):
           for i, column in enumerate(columns):   # Getting index as well to know when to print the next line
                if i == len(columns) - 1:
                     print(column[row], end="")
+               elif i == 0:
+                    print("\t       " + column[row], end=" | ")
                else:
                     print(column[row], end=" | ")
           print()
           
+# Function to check if the user won
+def check_winnings(columns, lines, bet, winning_multiplier):
+     winnings = 0                                     # To calulate the winnings
+     winning_lines = []                               # To store the lines user won on
+     
+     for line in range(lines):
+          first_symbol = columns[0][line]             # Remembering the symbol of first row first column
+          for column in columns:
+               symbol_to_check = column[line]         # Updating the symbol to be checked with first row first col sym
+               if symbol_to_check != first_symbol:    # If symbol does not match, loop breaks. Else all are same, user won
+                    break
+          else:
+               winnings += winning_multiplier[first_symbol] * bet 
+               winning_lines.append(line + 1)
+     
+     return winnings, winning_lines
 
+# Function to spin the slot machine once
+def spin_once(balance):
+     lines = ask_nof_lines()
+     
+     # This while loop keeps the total bet price less than or equal to the deposited amount
+     while True:                         
+          bet = ask_bet()
+          total_bet = bet * lines
+          
+          if total_bet > balance:
+               print("\t! You haven't deposited enough chips to make this bet ! ")
+          else:
+               break
+     
+     # Informing user mid process 
+     print("\n********************************************************")     
+     print(f"\nYou are betting {bet} chips on {lines} lines. Total bet is {total_bet} chips.")
+     
+     # 2. Processing & displaying the bet
+     print("\n********************************************************")
+     print("\t\tResults")
+     spinned_slots = spin_the_slots(ROWS, COLS, symbol_count_perCol)
+     display_slots(spinned_slots)
+     # print("\n********************************************************")
+          
+     # 3. Calculating & displaying the winnings
+     winnings, winning_lines  = check_winnings(spinned_slots, lines, bet, winning_multiplier)
+     
+     if winnings == 0:
+          print("\nYou did not win :(\nNext time you will!")
+          winnings -= total_bet
+     else:
+          print(f"\nYou won {winnings} chips on line", end=" ")
+          print(*winning_lines)
+     
+     return winnings
+     
+          
 
 # ___________________________________________Main body of the program _____________________________________________________________
 
 def main():
      # 1. Taking the bet
      instructions()
-     # balance = deposit()
-     # lines = ask_nof_lines()
+     balance = deposit()
+     while True:
+          print("\n********************************************************")
+          print("\nCurrent balance: ", balance)
+          ans = input("\nPress Enter to spin, Q to quit")
+          if ans != 'q' and ans != 'Q':
+               winnings = spin_once(balance)
+               balance += winnings
+               if balance == 0:
+                    print("\nYou need to deposite more chips!")
+                    break
+          else:
+               break
      
-     # # This while loop keeps the total bet price less than or equal to the deposited amount
-     # while True:                         
-     #      bet = ask_bet()
-     #      total_bet = bet * lines
-          
-     #      if total_bet > balance:
-     #           print("\t! You haven't deposited enough chips to make this bet ! ")
-     #      else:
-     #           break
-     
-     # # Informing user mid process          
-     # print(f"\nYou are betting {bet} chips on {lines} lines. Total bet is {total_bet} chips.\n")
-
-     # 2. Processing the bet
-     spinned_slots = spin_the_slots(ROWS, COLS, symbol_count_perCol)
-     displayed_slots = display_slots(spinned_slots)
+     print(f"\nYou left with {balance} chips.\n\n")     
      
 main()
